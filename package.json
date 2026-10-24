@@ -1,0 +1,8 @@
+{
+  "name": "dukka",
+  "private": true,
+  "version": "1.0.0",
+  "description": "دكّة: حراج ووظائف في السعودية",
+  "type": "module",
+  "engines": { "node": ">=20" }
+}
