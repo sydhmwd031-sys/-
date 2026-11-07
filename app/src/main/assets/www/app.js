@@ -35,31 +35,54 @@ const METHODS = [
   ['auto','تلقائي حسب البلد'],['UmmAlQura','أم القرى (السعودية)'],['MuslimWorldLeague','رابطة العالم الإسلامي'],
   ['Egyptian','الهيئة المصرية'],['Kuwait','الكويت'],['Qatar','قطر'],['Dubai','الإمارات'],['Karachi','كراتشي'],['Turkey','تركيا']
 ];
-const AUDIO_BASE = 'https://raw.githubusercontent.com/meypod/audio_files/main/adhan/';
-const SOUND_SLOTS = [
-  {id:'nabawi',   n:'أذان المسجد النبوي',  d:'تحميل من النت', url:AUDIO_BASE+'masjid_an_nabawi.mp3'},
-  {id:'mulla',    n:'علي أحمد ملا',        d:'مؤذن المسجد الحرام'},
-  {id:'bukhari',  n:'عصام بخاري',          d:'مؤذن المسجد النبوي'},
-  {id:'qatami',   n:'ناصر القطامي',        d:'أذان'},
-  {id:'afasy',    n:'مشاري العفاسي',       d:'أذان'},
-  {id:'abdulbasit',n:'عبدالباسط عبدالصمد', d:'تحميل من النت', url:AUDIO_BASE+'abdul_basit_abdus_samad.mp3'},
-  {id:'ghalwash', n:'راغب مصطفى غلوش',     d:'تحميل من النت', url:AUDIO_BASE+'ragheb_mustafa_ghalwash.mp3'},
-  {id:'refaat',   n:'محمد رفعت',           d:'أذان'},
-  {id:'fajr_adhan',n:'أذان فجر خاص',       d:'أذان فيه «الصلاة خير من النوم»'},
-  {id:'custom1',  n:'صوت إضافي ١',         d:'أذان أو نغمة تختارها'},
-  {id:'tone1',    n:'نغمة منبه ١',          d:'صوت قوي للمنبه'},
-  {id:'tone2',    n:'نغمة منبه ٢',          d:'صوت قوي للمنبه'}
+const MEYPOD = 'https://raw.githubusercontent.com/meypod/audio_files/main/adhan/';
+const ABODE  = 'https://raw.githubusercontent.com/abodehq/Athan-MP3/master/Sounds/';
+const ab = f => ABODE + encodeURIComponent('Athan ' + f) + '.mp3';
+/* كل المؤذنين يتحمّلون من النت مرة وحدة ويشتغلون بعدها بدون نت */
+const ADHANS = [
+  {id:'nabawi',    n:'المسجد النبوي',            d:'أذان الحرم المدني',   url:MEYPOD+'masjid_an_nabawi.mp3'},
+  {id:'makkah',    n:'المسجد الحرام',            d:'أذان الحرم المكي',    url:ab('Makkah')},
+  {id:'fajr_malek',n:'أذان الفجر',               d:'مالك شيبة · فيه «الصلاة خير من النوم»', url:ab('Al-fajer - Malek chebae'), fajr:true},
+  {id:'afasy',     n:'مشاري العفاسي',            d:'الكويت',              url:ab('Mishary Alafasi')},
+  {id:'qatami',    n:'ناصر القطامي',             d:'الرياض',              url:ab('Nasser Alqatami')},
+  {id:'zahrani',   n:'منصور الزهراني',           d:'الرياض',              url:ab('Mansoor Az-Zahrani')},
+  {id:'malki',     n:'حمدان المالكي',            d:'',                    url:ab('Hamdan Almalki')},
+  {id:'deghreri',  n:'حمد الدغريري',             d:'',                    url:ab('Hamad Deghreri')},
+  {id:'nufais',    n:'أحمد النفيس',              d:'',                    url:ab('Ahmad Nuyne3')},
+  {id:'arkani',    n:'إبراهيم الأركاني',         d:'',                    url:ab('Ibrahim Al-Arkani')},
+  {id:'hamathani', n:'ماجد الحمداني',            d:'',                    url:ab('Majed Al-hamathani')},
+  {id:'khatba',    n:'صهيب خطبة',                d:'',                    url:ab('Suhaib Khatba')},
+  {id:'abdulbasit',n:'عبدالباسط عبدالصمد',       d:'مصر',                 url:MEYPOD+'abdul_basit_abdus_samad.mp3'},
+  {id:'minshawi',  n:'محمد صديق المنشاوي',        d:'مصر',                 url:ab('Mohammad Almenshawy')},
+  {id:'refaat',    n:'محمد رفعت',                d:'مصر',                 url:ab('Mohammad Ref3at')},
+  {id:'ghalwash',  n:'راغب مصطفى غلوش',          d:'مصر',                 url:MEYPOD+'ragheb_mustafa_ghalwash.mp3'}
 ];
+/* نغمات منبه مدمجة في التطبيق */
+const TONES = [
+  {id:'tone_sunrise', n:'شروق',        d:'نغمة متصاعدة هادئة',  f:'sunrise'},
+  {id:'tone_bells',   n:'أجراس',       d:'رنين صافي',            f:'bells'},
+  {id:'tone_breeze',  n:'نسيم',        d:'لحن شرقي',             f:'breeze'},
+  {id:'tone_birds',   n:'طيور الصباح', d:'عصافير وأجراس',        f:'birds'},
+  {id:'tone_pulse',   n:'نبض',         d:'تنبيه رقمي قوي',       f:'pulse'},
+  {id:'tone_siren',   n:'إنذار',       d:'الأقوى لثقيلين النوم', f:'siren'}
+];
+const MINE = [
+  {id:'custom1', n:'صوت من جوالك ١'}, {id:'custom2', n:'صوت من جوالك ٢'}, {id:'custom3', n:'صوت من جوالك ٣'}
+];
+const ALL_SOUNDS = [...ADHANS, ...TONES, ...MINE];
+const soundName = id => (ALL_SOUNDS.find(x => x.id === id) || {}).n || id;
 
 const DEF = {
   loc:{type:'city', i:0}, method:'auto', madhab:'Shafi',
   fajrOn:true, offset:0, barcode:null, emerg:2,
-  fajrAdhanFirst:true, fajrSound:'', alarmSound:'', adhanSound:'',
+  fajrAdhanFirst:true, fajrSound:'', alarmSound:'tone_sunrise', adhanSound:'',
   adhan:{fajr:false, dhuhr:true, asr:true, maghrib:true, isha:true},
-  fontQ:26, lastSurah:null
+  lastPage:1, marks:[], tafsir:'muyassar'
 };
 function loadS(){ try{ const v = JSON.parse(localStorage.getItem('fajr.settings') || 'null'); return v ? Object.assign({}, DEF, v, {adhan:Object.assign({}, DEF.adhan, v.adhan||{})}) : structuredClone(DEF); }catch(e){ return structuredClone(DEF); } }
 let S = loadS();
+if (!S.alarmSound) S.alarmSound = 'tone_sunrise';
+if (!Array.isArray(S.marks)) S.marks = [];
 function save(){ try{ localStorage.setItem('fajr.settings', JSON.stringify(S)); }catch(e){} }
 
 const ar = n => Number(n).toLocaleString('ar-SA');
@@ -162,6 +185,7 @@ function show(v){
   document.querySelectorAll('.view').forEach(x => x.hidden = x.id !== 'v-' + v);
   document.querySelectorAll('.tabs button').forEach(b => { if (b.dataset.v === v) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   if (v === 'alarm') renderPerms();
+  if (v === 'quran' && window.initQuranIndex) window.initQuranIndex();
   window.scrollTo(0,0);
 }
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(b.dataset.v); });
@@ -198,30 +222,57 @@ function renderAlarmLine(){
 }
 function renderBarcode(){
   const box = $('#barcodeBox');
-  const ico = '<svg viewBox="0 0 44 30" aria-hidden="true"><g fill="currentColor"><rect x="1" y="2" width="2" height="26"/><rect x="5" y="2" width="1" height="26"/><rect x="8" y="2" width="3" height="26"/><rect x="13" y="2" width="1" height="26"/><rect x="16" y="2" width="2" height="26"/><rect x="21" y="2" width="1" height="26"/><rect x="24" y="2" width="3" height="26"/><rect x="29" y="2" width="1" height="26"/><rect x="32" y="2" width="2" height="26"/><rect x="36" y="2" width="1" height="26"/><rect x="39" y="2" width="3" height="26"/></g></svg>';
+  const ico = '<svg viewBox="0 0 40 40" aria-hidden="true"><g fill="currentColor"><path d="M4 4h12v12H4zM7 7v6h6V7zM24 4h12v12H24zM27 7v6h6V7zM4 24h12v12H4zM7 27v6h6v-6z"/><path d="M24 24h4v4h-4zM30 24h6v4h-6zM24 30h4v6h-4zM30 30h2v2h-2zM32 32h4v4h-4z"/></g></svg>';
   if (S.barcode){
+    const mine = S.barcode.startsWith('FAJR-');
     box.className = 'barcode-box set';
-    box.innerHTML = `${ico}<div><b>باركود مسجّل</b><small>ينتهي بـ ${esc(S.barcode.slice(-4))} · ${S.barcode.length} خانة</small></div>`;
-    $('#regBarcode').textContent = 'تغيير الباركود';
+    box.innerHTML = `${ico}<div><b>${mine ? 'باركود الإيقاف جاهز' : 'باركود منتج مسجّل'}</b><small>${mine ? esc(S.barcode) : 'ينتهي بـ ' + esc(S.barcode.slice(-4))}</small></div>`;
   } else {
     box.className = 'barcode-box';
     box.innerHTML = `${ico}<div><b>ما فيه باركود مسجّل</b><small>بدونه ما يوقف المنبه إلا زر الطوارئ</small></div>`;
-    $('#regBarcode').textContent = 'تسجيل باركود';
   }
   $('#testBarcode').disabled = !S.barcode;
 }
-function soundOptions(sel, defLabel){
-  const have = N ? JSON.parse(N.listSounds() || '{}') : {};
-  const opts = [`<option value="">${defLabel}</option>`].concat(
-    SOUND_SLOTS.filter(s => have[s.id]).map(s => `<option value="${s.id}">${esc(s.n)}</option>`));
-  sel.innerHTML = opts.join('');
-  sel.value = have[S[sel.id]] ? S[sel.id] : '';
+function haveSounds(){ try { return N ? JSON.parse(N.listSounds() || '{}') : {}; } catch(e){ return {}; } }
+function available(id, have){ return id.startsWith('tone_') || !!have[id]; }
+function soundOptions(sel, defLabel, list){
+  const have = haveSounds();
+  sel.innerHTML = [`<option value="">${defLabel}</option>`].concat(
+    list.filter(x => available(x.id, have)).map(x => `<option value="${x.id}">${esc(x.n)}</option>`)).join('');
+  sel.value = available(S[sel.id] || '', have) ? S[sel.id] : '';
 }
 function renderSoundSelects(){
-  soundOptions($('#fajrSound'), 'نفس صوت الأذان');
-  soundOptions($('#alarmSound'), 'نغمة المنبه الأساسية في الجوال');
-  soundOptions($('#adhanSound'), 'نغمة الإشعار في الجوال');
+  soundOptions($('#fajrSound'), 'نفس صوت الأذان', [...ADHANS, ...MINE]);
+  soundOptions($('#alarmSound'), 'نغمة المنبه في الجوال', [...TONES, ...ADHANS, ...MINE]);
+  soundOptions($('#adhanSound'), 'نغمة الإشعار في الجوال', [...ADHANS, ...MINE]);
 }
+/* ---------- إنشاء باركود إيقاف ---------- */
+function newCode(){
+  const a = new Uint8Array(6); (crypto.getRandomValues ? crypto.getRandomValues(a) : a.forEach((_,i) => a[i] = Math.random()*256));
+  return 'FAJR-' + Array.from(a, x => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[x % 32]).join('');
+}
+function drawQr(code){
+  const q = qrcode(0, 'H'); q.addData(code); q.make();
+  const c = $('#qrCanvas'), g = c.getContext('2d'), n = q.getModuleCount();
+  const W = c.width, cell = Math.floor((W - 80) / n), off = Math.floor((W - cell*n) / 2);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, c.height);
+  g.fillStyle = '#0d2a2c';
+  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r,k)) g.fillRect(off + k*cell, 40 + r*cell, cell, cell);
+  g.textAlign = 'center'; g.fillStyle = '#0d2a2c';
+  g.font = '700 38px Messiri, Readex, sans-serif'; g.fillText('امسحني عشان توقف منبه الفجر', W/2, 40 + n*cell + 70);
+  g.font = '600 26px Readex, sans-serif'; g.fillStyle = '#986812'; g.fillText(code, W/2, 40 + n*cell + 115);
+}
+function openQrGen(){
+  const code = newCode(); drawQr(code);
+  S.barcode = code; save(); renderBarcode(); renderAlarmTile();
+  $('#qrGen').hidden = false;
+}
+$('#qrDone').onclick = () => { $('#qrGen').hidden = true; toast('تم. المنبه ما يوقف إلا بهذا الباركود'); };
+$('#qrSave').onclick = () => {
+  const data = $('#qrCanvas').toDataURL('image/png').split(',')[1];
+  if (N){ const r = N.saveImage(data, 'باركود-منبه-الفجر.png'); toast(r || 'تم الحفظ في الصور'); }
+  else toast('اضغط مطوّلاً على الصورة واحفظها');
+};
 function initAlarmTab(){
   const off = $('#offset');
   off.innerHTML = [-30,-20,-15,-10,-5,0,5,10,15,20,30].map(m =>
@@ -238,6 +289,9 @@ function initAlarmTab(){
   $('#emergMinus').onclick = () => setEm(S.emerg - 1);
   $('#emergPlus').onclick = () => setEm(S.emerg + 1);
   ['fajrSound','alarmSound','adhanSound'].forEach(id => $('#'+id).onchange = e => { S[id] = e.target.value; save(); sync(); });
+  $('#genBarcode').onclick = openQrGen;
+  $('#goSounds').onclick = () => { show('prefs'); setTimeout(() => $('#soundsTitle').scrollIntoView({behavior:'smooth'}), 50); };
+  $('#alarmTile').onclick = () => show('alarm');
   $('#regBarcode').onclick = () => openScanner('register');
   $('#testBarcode').onclick = () => openScanner('test');
   $('#testAlarm').onclick = () => { if (N) N.testAlarm(); else startRing(true); };
@@ -258,14 +312,21 @@ function renderPerms(){
     ? '<span class="pill ok">مفعّل</span>' : `<button class="btn" data-perm="${k}">تفعيل</button>`}</li>`).join('');
 }
 $('#perms').addEventListener('click', e => { const b = e.target.closest('[data-perm]'); if (b && N) N.fixPerm(b.dataset.perm); });
-window.onPermsChanged = () => { renderPerms(); };
+window.onPermsChanged = () => {
+  renderPerms();
+  if (pendingScan && N){ let p = {}; try { p = JSON.parse(N.permStatus()); } catch(e){}
+    const m = pendingScan; pendingScan = null;
+    if (p.camera) openScanner(m); else toast('فعّل صلاحية الكاميرا عشان تمسح الباركود'); }
+};
 
 /* ========== الماسح ========== */
-let qr = null, scanMode = null, scanBusy = false;
+let qr = null, scanMode = null, scanBusy = false, pendingScan = null;
 async function openScanner(mode){
   scanMode = mode; scanBusy = false;
+  if (N){ let p = {}; try { p = JSON.parse(N.permStatus()); } catch(e){}
+    if (!p.camera){ pendingScan = mode; N.fixPerm('camera'); return; } }
   $('#scanner').hidden = false; $('#scanMsg').textContent = '';
-  $('#scanTitle').textContent = mode === 'register' ? 'امسح باركود المنتج اللي بتستخدمه للإيقاف' : 'امسح الباركود المسجّل';
+  $('#scanTitle').textContent = mode === 'register' ? 'امسح باركود أو كيو آر المنتج اللي بتستخدمه للإيقاف' : 'امسح باركود الإيقاف';
   if (typeof Html5Qrcode === 'undefined'){ $('#scanMsg').textContent = 'الماسح غير متاح، استخدم التصوير.'; return; }
   try{
     qr = new Html5Qrcode('qrReader', {verbose:false});
@@ -321,7 +382,7 @@ function stopRing(){
 }
 $('#ringScan').onclick = () => openScanner('stop');
 $('#ringClose').onclick = () => { $('#ring').hidden = true; if (RING_MODE && N) N.finishScreen(); else document.getElementById('app').hidden = false; };
-$('#goMorning').onclick = () => { $('#ring').hidden = true; document.getElementById('app').hidden = false; show('azkar'); selectAzkar('morning'); initQuran(); };
+$('#goMorning').onclick = () => { $('#ring').hidden = true; document.getElementById('app').hidden = false; show('azkar'); selectAzkar('morning'); };
 
 function resetHold(){
   clearInterval(holdTimer); holdTimer = null;
@@ -406,39 +467,7 @@ function renderTasbih(body){
   $('#tsbReset').onclick = () => { tsb.n = 0; $('#tsbN').textContent = ar(0); };
 }
 
-/* ========== القرآن ========== */
-async function initQuran(){
-  await loadQuran();
-  const list = $('#surahs');
-  list.innerHTML = QURAN.map((s,i) => `<li data-q="${i+1} ${s[0]}"><button data-s="${i+1}"><span class="s-no">${ar(i+1)}</span><span class="s-name">${s[0]}</span><span class="s-meta">${s[1]==='m'?'مكية':'مدنية'} · ${ar(s[2].length)} آية</span></button></li>`).join('');
-  renderResume();
-}
-function renderResume(){
-  const r = $('#resume');
-  if (S.lastSurah && QURAN){ r.hidden = false; r.innerHTML = `<span>تابع القراءة: سورة ${QURAN[S.lastSurah-1][0]}</span><span>←</span>`; } else r.hidden = true;
-}
-$('#resume').onclick = () => openSurah(S.lastSurah);
-$('#surahSearch').oninput = e => {
-  const q = e.target.value.trim().replace(/[أإآ]/g,'ا');
-  document.querySelectorAll('#surahs li').forEach(li => li.hidden = q && !li.dataset.q.replace(/[أإآ]/g,'ا').includes(q));
-};
-$('#surahs').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (b) openSurah(+b.dataset.s); });
-let curSurah = 1;
-function openSurah(n){
-  curSurah = n; S.lastSurah = n; save();
-  const s = QURAN[n-1];
-  $('#readerTitle').textContent = 'سورة ' + s[0];
-  const basm = (n !== 1 && n !== 9) ? '<div class="basmala">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>' : '';
-  $('#mushaf').innerHTML = basm + s[2].map((t,i) => `${t} <span class="ayah-n">${ar(i+1)}</span>`).join(' ');
-  $('#mushaf').style.fontSize = S.fontQ + 'px';
-  $('#nextSurah').hidden = n === 114;
-  $('#quranList').hidden = true; $('#reader').hidden = false; window.scrollTo(0,0);
-}
-$('#readerBack').onclick = () => { $('#reader').hidden = true; $('#quranList').hidden = false; renderResume(); };
-$('#fontPlus').onclick = () => { S.fontQ = Math.min(44, S.fontQ + 2); save(); $('#mushaf').style.fontSize = S.fontQ + 'px'; };
-$('#fontMinus').onclick = () => { S.fontQ = Math.max(18, S.fontQ - 2); save(); $('#mushaf').style.fontSize = S.fontQ + 'px'; };
-$('#nextSurah').onclick = () => openSurah(curSurah + 1);
-$('#listenSurah').onclick = () => { const u = 'https://quran.com/' + curSurah; if (N) N.openUrl(u); else window.open(u, '_blank'); };
+/* ========== القرآن: في mushaf.js ========== */
 
 /* ========== الإعدادات ========== */
 function initPrefs(){
@@ -468,41 +497,67 @@ window.onNativeLocation = loc => {
   save(); _cache.clear(); initPrefs(); renderHome(); sync();
   $('#gpsMsg').textContent = `تم: ${S.loc.label} (${S.loc.lat}, ${S.loc.lng})`;
 };
+let sTab = 'adhan';
+const downloading = new Set();
+const PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
+const STOP = '<svg viewBox="0 0 24 24"><path d="M7 7h10v10H7z" fill="currentColor"/></svg>';
+let playing = null, webAudio = null;
 function renderSounds(){
-  const have = N ? JSON.parse(N.listSounds() || '{}') : {};
-  $('#sounds').innerHTML = SOUND_SLOTS.map(s => `<li><span class="dot ${have[s.id]?'on':''}"></span>
-    <span class="who"><b>${esc(s.n)}</b><small>${have[s.id] ? esc(have[s.id]) : esc(s.d)}</small></span>
-    <span class="act">${have[s.id]
-      ? `<button class="btn" data-play="${s.id}">تشغيل</button><button class="btn" data-pick="${s.id}">استبدال</button><button class="btn danger" data-del="${s.id}" aria-label="حذف">حذف</button>`
-      : (s.url ? `<button class="btn primary" data-dl="${s.id}">${downloading.has(s.id) ? 'جاري التحميل…' : 'تحميل'}</button>` : '')
-        + `<button class="btn" data-pick="${s.id}">${s.url ? 'من ملف' : 'إضافة ملف'}</button>`}</span></li>`).join('');
+  const have = haveSounds();
+  document.querySelectorAll('#sTabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.t === sTab));
+  const list = sTab === 'adhan' ? ADHANS : sTab === 'tones' ? TONES : MINE;
+  const chosenKey = sTab === 'tones' ? 'alarmSound' : 'adhanSound';
+  $('#sounds').innerHTML = list.map(x => {
+    const ok = available(x.id, have), chosen = S[chosenKey] === x.id || (sTab !== 'tones' && S.fajrSound === x.id);
+    const sub = sTab === 'mine' ? (have[x.id] ? esc(have[x.id]) : 'أذان أو نغمة من ملفات جوالك') : (ok ? esc(x.d || 'جاهز') : (downloading.has(x.id) ? 'جاري التحميل…' : esc(x.d || 'يحتاج تحميل مرة وحدة')));
+    let act = '';
+    if (ok){
+      act += sTab === 'tones'
+        ? `<button class="btn ${S.alarmSound===x.id?'primary':''}" data-use="alarmSound" data-id="${x.id}">${S.alarmSound===x.id?'نغمة المنبه':'اختر للمنبه'}</button>`
+        : `<button class="btn ${S.adhanSound===x.id?'primary':''}" data-use="adhanSound" data-id="${x.id}">${S.adhanSound===x.id?'صوت الأذان':'للأذان'}</button>`
+          + `<button class="btn ${S.fajrSound===x.id?'primary':''}" data-use="fajrSound" data-id="${x.id}">${S.fajrSound===x.id?'أذان الفجر':'للفجر'}</button>`;
+      if (sTab === 'mine') act += `<button class="btn danger" data-del="${x.id}">حذف</button>`;
+    } else if (sTab === 'mine'){
+      act = `<button class="btn" data-pick="${x.id}">إضافة ملف</button>`;
+    } else {
+      act = `<button class="btn primary" data-dl="${x.id}" ${downloading.has(x.id)?'disabled':''}>${downloading.has(x.id)?'جاري…':'تحميل'}</button>`;
+    }
+    return `<li class="${chosen?'chosen':''}">${ok ? `<button class="play" data-play="${x.id}" aria-label="استماع">${playing===x.id?STOP:PLAY}</button>` : '<span class="play" aria-hidden="true" style="opacity:.35">'+PLAY+'</span>'}
+      <span class="who"><b>${esc(x.n)}</b><small>${sub}</small></span><span class="act">${act}</span></li>`;
+  }).join('');
   renderSoundSelects();
 }
-const downloading = new Set();
+$('#sTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ sTab = b.dataset.t; renderSounds(); } });
 function downloadSound(id){
-  const slot = SOUND_SLOTS.find(x => x.id === id); if (!slot || !slot.url || !N || downloading.has(id)) return;
-  downloading.add(id); renderSounds(); N.downloadSound(id, slot.url, slot.n);
+  const x = ADHANS.find(a => a.id === id); if (!x || !N || downloading.has(id)) return;
+  downloading.add(id); renderSounds(); N.downloadSound(id, x.url, x.n);
 }
-window.onSoundFailed = slot => { downloading.delete(slot); renderSounds(); toast('ما قدرت أحمّل الصوت. تأكد من النت وجرّب مرة ثانية'); };
-let playing = null;
+function stopPlaying(){ if (N) N.stopPreview(); if (webAudio){ webAudio.pause(); webAudio = null; } playing = null; }
 $('#sounds').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (!N){ toast('إضافة الأصوات متاحة في تطبيق الأندرويد'); return; }
+  if (b.dataset.play){
+    const id = b.dataset.play; const was = playing === id; stopPlaying();
+    if (!was){
+      playing = id;
+      if (id.startsWith('tone_')){ webAudio = new Audio('tones/' + TONES.find(t => t.id === id).f + '.ogg'); webAudio.onended = () => { playing = null; renderSounds(); }; webAudio.play().catch(() => {}); }
+      else if (N) N.previewSound(id);
+    }
+    renderSounds(); return;
+  }
+  if (b.dataset.use){ S[b.dataset.use] = b.dataset.id; save(); sync(); renderSounds(); toast(`تم: ${soundName(b.dataset.id)}`); return; }
+  if (!N){ toast('تحميل الأصوات وإضافتها في تطبيق الأندرويد'); return; }
   if (b.dataset.dl) downloadSound(b.dataset.dl);
   else if (b.dataset.pick) N.pickSound(b.dataset.pick);
-  else if (b.dataset.del){ N.deleteSound(b.dataset.del); ['fajrSound','alarmSound','adhanSound'].forEach(k => { if (S[k] === b.dataset.del) S[k] = ''; }); save(); renderSounds(); sync(); }
-  else if (b.dataset.play){
-    if (playing === b.dataset.play){ N.stopPreview(); playing = null; b.textContent = 'تشغيل'; }
-    else { N.stopPreview(); document.querySelectorAll('[data-play]').forEach(x => x.textContent = 'تشغيل'); N.previewSound(b.dataset.play); playing = b.dataset.play; b.textContent = 'إيقاف'; }
-  }
+  else if (b.dataset.del){ N.deleteSound(b.dataset.del); ['fajrSound','alarmSound','adhanSound'].forEach(k => { if (S[k] === b.dataset.del) S[k] = k === 'alarmSound' ? 'tone_sunrise' : ''; }); save(); renderSounds(); sync(); }
 });
+window.onSoundFailed = slot => { downloading.delete(slot); renderSounds(); toast('ما قدرت أحمّل الصوت. تأكد من النت وجرّب مرة ثانية'); };
 window.onSoundPicked = (slot, name) => {
-  downloading.delete(slot); renderSounds();
-  if (!S.adhanSound && !slot.startsWith('tone')) { S.adhanSound = slot; }
-  if (!S.alarmSound && slot.startsWith('tone')) { S.alarmSound = slot; }
-  save(); renderSoundSelects(); sync(); toast('تمت إضافة الصوت: ' + name);
+  downloading.delete(slot);
+  if (!S.adhanSound && !slot.startsWith('tone')) S.adhanSound = slot;
+  if (!S.fajrSound && slot === 'fajr_malek') S.fajrSound = slot;
+  save(); renderSounds(); sync(); toast('جاهز: ' + soundName(slot));
 };
-window.onPreviewEnded = () => { playing = null; document.querySelectorAll('[data-play]').forEach(x => x.textContent = 'تشغيل'); };
+window.onPreviewEnded = () => { playing = null; renderSounds(); };
 
 /* ========== تشغيل ========== */
 function boot(){
@@ -512,10 +567,13 @@ function boot(){
   document.addEventListener('visibilitychange', () => { if (!document.hidden){ renderHome(); renderPerms(); } });
   if (RING_MODE){ startRing(false); }
   else {
-    initQuran(); renderAzkar(); sync();
-    // أول تشغيل: نحمّل أذان المسجد النبوي تلقائياً عشان يطلع صوت الأذان مباشرة
-    if (N){ let have = {}; try { have = JSON.parse(N.listSounds() || '{}'); } catch(e){}
-      if (!have.nabawi && !localStorage.getItem('fajr.autoDl')){ try{ localStorage.setItem('fajr.autoDl','1'); }catch(e){} downloadSound('nabawi'); toast('جاري تحميل صوت الأذان…'); } }
+    renderAzkar(); sync();
+    // أول تشغيل: نحمّل أذان المسجد النبوي وأذان الفجر عشان يطلع صوت الأذان مباشرة
+    if (N){ const have = haveSounds(); let done = ''; try { done = localStorage.getItem('fajr.autoDl2') || ''; } catch(e){}
+      if (!done){ try{ localStorage.setItem('fajr.autoDl2','1'); }catch(e){}
+        if (!have.nabawi) downloadSound('nabawi'); else if (!S.adhanSound){ S.adhanSound = 'nabawi'; save(); }
+        if (!have.fajr_malek) downloadSound('fajr_malek');
+        toast('جاري تحميل أصوات الأذان…'); } }
   }
 }
 boot();

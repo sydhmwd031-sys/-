@@ -11,7 +11,7 @@
 <div id="app">
   <header class="top">
     <div class="top-in">
-      <div>
+      <div class="top-txt">
         <div class="hijri" id="hijri">—</div>
         <div class="place" id="placeLabel">—</div>
       </div>
@@ -20,13 +20,19 @@
   </header>
 
   <main>
-    <!-- الرئيسية -->
+    <!-- المواقيت -->
     <section class="view" id="v-home">
-      <div class="next card-hero">
-        <div class="next-label">الصلاة القادمة</div>
-        <div class="next-name" id="nextName">—</div>
-        <div class="next-count" id="nextCount">--:--:--</div>
-        <div class="next-at" id="nextAt"></div>
+      <div class="mihrab">
+        <svg class="mihrab-arch" viewBox="0 0 360 300" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M8 300V128C8 60 96 14 180 6c84 8 172 54 172 122v172" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M22 300V132C22 72 102 30 180 22c78 8 158 50 158 110v168" fill="none" stroke="currentColor" stroke-width=".8" stroke-opacity=".5"/>
+        </svg>
+        <div class="mihrab-in">
+          <div class="next-label">الصلاة القادمة</div>
+          <div class="next-name" id="nextName">—</div>
+          <div class="next-count" id="nextCount">--:--:--</div>
+          <div class="next-at" id="nextAt"></div>
+        </div>
         <div class="dayline" aria-hidden="true"><div class="dayline-track" id="dayline"></div></div>
       </div>
 
@@ -37,18 +43,18 @@
           <div class="tile-k">القبلة</div>
           <div class="qibla">
             <svg viewBox="0 0 64 64" class="compass" aria-hidden="true">
-              <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>
-              <text x="32" y="11" text-anchor="middle" font-size="8" fill="currentColor" fill-opacity=".6">N</text>
-              <g id="qiblaNeedle"><path d="M32 8 L37 34 L32 30 L27 34 Z" fill="var(--dawn)"/></g>
+              <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="1.5"/>
+              <text x="32" y="12" text-anchor="middle" font-size="8" fill="currentColor" fill-opacity=".6">N</text>
+              <g id="qiblaNeedle"><path d="M32 9 L36.5 33 L32 29.5 L27.5 33 Z" fill="var(--brass)"/></g>
             </svg>
             <div><span class="big-num" id="qiblaDeg">—</span><small>° من الشمال</small></div>
           </div>
         </div>
-        <div class="tile" id="alarmTile">
+        <button class="tile tile-btn" id="alarmTile">
           <div class="tile-k">منبه الفجر</div>
           <div class="big-num" id="alarmAtTile">—</div>
           <small id="alarmStateTile">—</small>
-        </div>
+        </button>
       </div>
     </section>
 
@@ -69,20 +75,21 @@
       </div>
 
       <div class="panel">
-        <div class="panel-h">طريقة الإيقاف</div>
+        <div class="panel-h">باركود الإيقاف</div>
         <div class="barcode-box" id="barcodeBox"></div>
-        <p class="hint">سجّل باركود منتج تحطه بعيد عن سريرك، مثل معجون الأسنان في الحمام أو علبة في المطبخ. ما يوقف المنبه إلا لما تقوم وتمسحه.</p>
-        <div class="btns">
-          <button class="btn primary" id="regBarcode">تسجيل باركود</button>
-          <button class="btn" id="testBarcode">تجربة المسح</button>
+        <div class="btns col">
+          <button class="btn primary" id="genBarcode">إنشاء باركود إيقاف خاص فيك</button>
+          <button class="btn" id="regBarcode">أو امسح باركود منتج عندك</button>
+          <button class="btn ghost" id="testBarcode">تجربة المسح</button>
         </div>
+        <p class="hint">الفكرة إن الباركود يكون بعيد عن سريرك. اطبعه أو صوّره وحطه في الحمام أو المطبخ، وما يوقف المنبه إلا لما تقوم وتمسحه.</p>
       </div>
 
       <div class="panel">
         <div class="panel-h">زر الطوارئ</div>
         <p class="hint">لو ما قدرت توصل للباركود: اضغط مطوّلاً على زر الطوارئ بدون ما ترفع إصبعك طول المدة اللي تحددها. لو رفعت إصبعك يبدأ العد من جديد.</p>
         <div class="field">
-          <label for="emerg">مدة الضغط المطوّل (بالدقائق، أقل شيء دقيقة)</label>
+          <label for="emerg">مدة الضغط المطوّل بالدقائق (أقلها دقيقة)</label>
           <div class="stepper">
             <button class="btn sq" id="emergMinus" aria-label="أنقص دقيقة">−</button>
             <input id="emerg" type="number" min="1" max="30" step="1" inputmode="numeric">
@@ -94,12 +101,12 @@
       <div class="panel">
         <div class="panel-h">صوت المنبه</div>
         <label class="switch-row">
-          <span><b>يبدأ بأذان الفجر</b><small>يشغّل الأذان أولاً ثم يكمّل بصوت المنبه</small></span>
+          <span><b>يبدأ بأذان الفجر</b><small>يشغّل الأذان أولاً ثم يكمّل بنغمة المنبه</small></span>
           <input type="checkbox" id="fajrAdhanFirst" class="sw">
         </label>
         <div class="field"><label for="fajrSound">أذان الفجر</label><select id="fajrSound"></select></div>
-        <div class="field"><label for="alarmSound">صوت المنبه بعد الأذان</label><select id="alarmSound"></select></div>
-        <div class="btns"><button class="btn" id="testAlarm">جرّب المنبه الحين</button></div>
+        <div class="field"><label for="alarmSound">نغمة المنبه بعد الأذان</label><select id="alarmSound"></select></div>
+        <div class="btns"><button class="btn" id="testAlarm">جرّب المنبه الحين</button><button class="btn ghost" id="goSounds">كل الأصوات</button></div>
       </div>
 
       <div class="panel" id="permPanel">
@@ -115,27 +122,17 @@
       <div id="azkarBody"></div>
     </section>
 
-    <!-- القرآن -->
+    <!-- القرآن: الفهرس -->
     <section class="view" id="v-quran" hidden>
-      <div id="quranList">
-        <h2 class="h">القرآن الكريم</h2>
-        <button class="resume" id="resume" hidden></button>
-        <input class="search" id="surahSearch" type="search" placeholder="ابحث باسم السورة أو رقمها">
-        <ol class="surahs" id="surahs"></ol>
+      <h2 class="h">المصحف الشريف</h2>
+      <button class="resume" id="resume"></button>
+      <div class="seg" role="tablist" id="qTabs">
+        <button role="tab" data-t="surahs" aria-selected="true">السور</button>
+        <button role="tab" data-t="juz" aria-selected="false">الأجزاء</button>
+        <button role="tab" data-t="marks" aria-selected="false">العلامات</button>
       </div>
-      <div id="reader" hidden>
-        <div class="reader-bar">
-          <button class="btn sq" id="readerBack" aria-label="رجوع">→</button>
-          <div class="reader-title" id="readerTitle"></div>
-          <button class="btn sq" id="fontMinus" aria-label="تصغير الخط">ـأ</button>
-          <button class="btn sq" id="fontPlus" aria-label="تكبير الخط">أ+</button>
-        </div>
-        <div class="mushaf" id="mushaf"></div>
-        <div class="reader-nav">
-          <button class="btn" id="nextSurah">السورة التالية</button>
-          <button class="btn" id="listenSurah">استمع للسورة</button>
-        </div>
-      </div>
+      <input class="search" id="surahSearch" type="search" placeholder="ابحث باسم السورة أو رقمها أو رقم الصفحة">
+      <ol class="index" id="qIndex"></ol>
     </section>
 
     <!-- الإعدادات -->
@@ -151,14 +148,16 @@
         </div>
       </div>
 
-      <h2 class="h">الأذان</h2>
+      <h2 class="h" id="soundsTitle">الأصوات</h2>
       <div class="panel">
         <div class="field"><label for="adhanSound">صوت الأذان للصلوات</label><select id="adhanSound"></select></div>
-        <p class="hint">فعّل الأذان لكل صلاة من جرس الصلاة في الصفحة الرئيسية.</p>
+        <p class="hint">فعّل الأذان لكل صلاة من الجرس اللي جنبها في صفحة المواقيت.</p>
       </div>
-
-      <h2 class="h">مكتبة الأصوات</h2>
-      <p class="hint pad">أضف تسجيل أذان كل مؤذن من ملفات جوالك مرة وحدة، وبعدها تقدر تختاره للأذان أو للمنبه. تقدر كمان تضيف أي نغمة منبه تبيها.</p>
+      <div class="seg" role="tablist" id="sTabs">
+        <button role="tab" data-t="adhan" aria-selected="true">المؤذنين</button>
+        <button role="tab" data-t="tones" aria-selected="false">نغمات المنبه</button>
+        <button role="tab" data-t="mine" aria-selected="false">أصواتي</button>
+      </div>
       <ul class="sounds" id="sounds"></ul>
     </section>
   </main>
@@ -166,10 +165,49 @@
   <nav class="tabs" id="tabs">
     <button data-v="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M12 3c-1 3-4 5-4 9a4 4 0 0 0 8 0c0-4-3-6-4-9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 21h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>المواقيت</span></button>
     <button data-v="alarm"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 9v4l2.5 2M5 4 2.5 6.5M19 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>المنبه</span></button>
+    <button data-v="quran"><svg viewBox="0 0 24 24"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5zM12 6v14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>المصحف</span></button>
     <button data-v="azkar"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="15.5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6.5" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6.5" cy="15.5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 19v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="currentColor"/></svg><span>الأذكار</span></button>
-    <button data-v="quran"><svg viewBox="0 0 24 24"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5zM12 6v14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>القرآن</span></button>
     <button data-v="prefs"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><span>الإعدادات</span></button>
   </nav>
+</div>
+
+<!-- المصحف -->
+<div id="mushaf" hidden>
+  <div class="m-bar">
+    <button class="m-btn" id="mBack" aria-label="رجوع للفهرس"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="m-title"><b id="mSurah">—</b><small id="mJuz">—</small></div>
+    <button class="m-btn" id="mMark" aria-label="حفظ علامة" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="m-stage" id="mStage">
+    <div class="m-page" id="mPage"></div>
+  </div>
+  <div class="m-foot">
+    <button class="m-btn" id="mPrev" aria-label="الصفحة السابقة"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+    <div class="m-hint" id="mHint">اسحب للتقليب · اضغط على الآية للتفسير</div>
+    <button class="m-btn" id="mNext" aria-label="الصفحة التالية"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+  </div>
+</div>
+
+<!-- التفسير -->
+<div id="sheet" hidden>
+  <div class="sheet-back" id="sheetBack"></div>
+  <div class="sheet-card" role="dialog" aria-label="التفسير">
+    <div class="sheet-grip"></div>
+    <div class="sheet-head"><b id="tRef">—</b><button class="btn ghost sm" id="tClose">إغلاق</button></div>
+    <p class="t-ayah" id="tAyah"></p>
+    <div class="seg small" id="tTabs" role="tablist">
+      <button role="tab" data-k="muyassar" aria-selected="true">الميسّر</button>
+      <button role="tab" data-k="saadi" aria-selected="false">السعدي</button>
+      <button role="tab" data-k="kathir" aria-selected="false">ابن كثير</button>
+    </div>
+    <div class="t-body" id="tBody"></div>
+    <div class="sheet-nav">
+      <button class="btn sm" id="tNext">الآية التالية</button>
+      <button class="btn sm" id="tPrev">الآية السابقة</button>
+    </div>
+  </div>
 </div>
 
 <!-- شاشة المنبه -->
@@ -198,6 +236,19 @@
   </div>
 </div>
 
+<!-- إنشاء باركود -->
+<div id="qrGen" hidden>
+  <div class="qr-card">
+    <div class="qr-title">باركود الإيقاف حقك</div>
+    <div class="qr-paper"><canvas id="qrCanvas" width="600" height="760"></canvas></div>
+    <p class="hint">احفظه في الصور واطبعه، أو افتحه في جوال ثاني أو ورقة وحطه بعيد عن سريرك. المنبه ما يوقف إلا بمسح هذا الباركود.</p>
+    <div class="btns col">
+      <button class="btn primary" id="qrSave">حفظ في الصور</button>
+      <button class="btn" id="qrDone">تم</button>
+    </div>
+  </div>
+</div>
+
 <!-- الماسح -->
 <div id="scanner" hidden>
   <div class="scan-in">
@@ -205,7 +256,7 @@
     <div id="qrReader"></div>
     <div class="scan-msg" id="scanMsg"></div>
     <div class="btns">
-      <label class="btn" for="scanPhoto">تصوير الباركود بدل البث المباشر</label>
+      <label class="btn" for="scanPhoto">تصوير الباركود</label>
       <input type="file" id="scanPhoto" accept="image/*" capture="environment" hidden>
       <button class="btn" id="scanClose">إلغاء</button>
     </div>
@@ -216,7 +267,9 @@
 
 <script src="lib/adhan.umd.min.js"></script>
 <script src="lib/html5-qrcode.min.js"></script>
+<script src="lib/qrcode.js"></script>
 <script src="azkar.js"></script>
 <script src="app.js"></script>
+<script src="mushaf.js"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.NotificationManager
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -16,7 +17,11 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.os.PowerManager
+import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Base64
+import android.os.Environment
+import java.io.File
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -214,6 +219,25 @@ open class ShellActivity : ComponentActivity() {
                    else "window.onSoundFailed && window.onSoundFailed(${q(slot)})")
             }.start()
         }
+        @JavascriptInterface fun saveImage(base64: String, name: String): String = try {
+            val bytes = Base64.decode(base64, Base64.DEFAULT)
+            val safe = name.replace(Regex("[\\\\/:*?\"<>|]"), "_")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val v = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, safe)
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/FajrAlarm")
+                }
+                val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v) ?: throw Exception("insert")
+                contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
+                "تم الحفظ في الصور (مجلد FajrAlarm)"
+            } else {
+                val d = getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: filesDir
+                File(d, safe).writeBytes(bytes)
+                "تم الحفظ في: " + File(d, safe).absolutePath
+            }
+        } catch (e: Exception) { "ما قدرت أحفظ الصورة. صوّر الشاشة بدلها" }
+
         @JavascriptInterface fun deleteSound(slot: String) = SoundStore.delete(this@ShellActivity, slot)
         @JavascriptInterface fun previewSound(slot: String) = runOnUiThread {
             SoundStore.preview(this@ShellActivity, slot) { js("window.onPreviewEnded && window.onPreviewEnded()") }

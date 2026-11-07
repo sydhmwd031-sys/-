@@ -16,10 +16,25 @@ object SoundStore {
 
     private fun dir(ctx: Context) = File(ctx.filesDir, "sounds").apply { mkdirs() }
 
+    private val TONES = setOf("sunrise", "bells", "breeze", "birds", "pulse", "siren")
+    private val SOURCES = listOf(
+        "https://raw.githubusercontent.com/meypod/audio_files/",
+        "https://raw.githubusercontent.com/abodehq/Athan-MP3/"
+    )
+
     fun file(ctx: Context, slot: String?): File? {
         if (slot.isNullOrEmpty() || !SLOT.matches(slot)) return null
         val f = File(dir(ctx), "$slot.snd")
-        return if (f.exists() && f.length() > 0) f else null
+        if (f.exists() && f.length() > 0) return f
+        // النغمات المدمجة: ننسخها من التطبيق أول مرة
+        val tone = slot.removePrefix("tone_")
+        if (slot.startsWith("tone_") && tone in TONES) {
+            return try {
+                ctx.assets.open("www/tones/$tone.ogg").use { i -> f.outputStream().use { i.copyTo(it) } }
+                f
+            } catch (e: Exception) { null }
+        }
+        return null
     }
 
     fun save(ctx: Context, slot: String, uri: Uri): String? {
@@ -38,7 +53,7 @@ object SoundStore {
 
     /** تحميل أذان من مستودع الأصوات المفتوح على GitHub. يشتغل في خيط خلفي. */
     fun download(ctx: Context, slot: String, url: String, name: String): Boolean {
-        if (!SLOT.matches(slot) || !url.startsWith("https://raw.githubusercontent.com/meypod/audio_files/")) return false
+        if (!SLOT.matches(slot) || SOURCES.none { url.startsWith(it) }) return false
         val tmp = File(dir(ctx), "$slot.tmp")
         return try {
             var target = URL(url)
