@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">منبه الفجر</string>
+    <string name="ch_alarm">منبه الفجر</string>
+    <string name="ch_adhan">الأذان</string>
+    <string name="ch_info">تنبيهات التطبيق</string>
+    <string name="alarm_title">حان وقت صلاة الفجر</string>
+    <string name="alarm_text">الصلاة خير من النوم. افتح لإيقاف المنبه</string>
+    <string name="adhan_title">حان وقت صلاة %1$s</string>
+    <string name="adhan_text">اللهم رب هذه الدعوة التامة والصلاة القائمة</string>
+    <string name="stop">إيقاف الأذان</string>
+    <string name="refresh_times">افتح التطبيق لتحديث مواقيت الأيام القادمة</string>
+</resources>

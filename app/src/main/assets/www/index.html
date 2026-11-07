@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>منبه الفجر</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="top-in">
+      <div>
+        <div class="hijri" id="hijri">—</div>
+        <div class="place" id="placeLabel">—</div>
+      </div>
+      <div class="clock" id="clock">--:--</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- الرئيسية -->
+    <section class="view" id="v-home">
+      <div class="next card-hero">
+        <div class="next-label">الصلاة القادمة</div>
+        <div class="next-name" id="nextName">—</div>
+        <div class="next-count" id="nextCount">--:--:--</div>
+        <div class="next-at" id="nextAt"></div>
+        <div class="dayline" aria-hidden="true"><div class="dayline-track" id="dayline"></div></div>
+      </div>
+
+      <ul class="prayers" id="prayerList"></ul>
+
+      <div class="row2">
+        <div class="tile">
+          <div class="tile-k">القبلة</div>
+          <div class="qibla">
+            <svg viewBox="0 0 64 64" class="compass" aria-hidden="true">
+              <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>
+              <text x="32" y="11" text-anchor="middle" font-size="8" fill="currentColor" fill-opacity=".6">N</text>
+              <g id="qiblaNeedle"><path d="M32 8 L37 34 L32 30 L27 34 Z" fill="var(--dawn)"/></g>
+            </svg>
+            <div><span class="big-num" id="qiblaDeg">—</span><small>° من الشمال</small></div>
+          </div>
+        </div>
+        <div class="tile" id="alarmTile">
+          <div class="tile-k">منبه الفجر</div>
+          <div class="big-num" id="alarmAtTile">—</div>
+          <small id="alarmStateTile">—</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- المنبه -->
+    <section class="view" id="v-alarm" hidden>
+      <h2 class="h">منبه الفجر</h2>
+
+      <div class="panel">
+        <label class="switch-row">
+          <span><b>تشغيل منبه الفجر</b><small>يرن حتى لو الجوال مقفل والتطبيق مسكّر</small></span>
+          <input type="checkbox" id="fajrOn" class="sw">
+        </label>
+        <div class="field">
+          <label for="offset">وقت الرنين بالنسبة لأذان الفجر</label>
+          <select id="offset"></select>
+        </div>
+        <div class="next-alarm" id="alarmNextLine">—</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">طريقة الإيقاف</div>
+        <div class="barcode-box" id="barcodeBox"></div>
+        <p class="hint">سجّل باركود منتج تحطه بعيد عن سريرك، مثل معجون الأسنان في الحمام أو علبة في المطبخ. ما يوقف المنبه إلا لما تقوم وتمسحه.</p>
+        <div class="btns">
+          <button class="btn primary" id="regBarcode">تسجيل باركود</button>
+          <button class="btn" id="testBarcode">تجربة المسح</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">زر الطوارئ</div>
+        <p class="hint">لو ما قدرت توصل للباركود: اضغط مطوّلاً على زر الطوارئ بدون ما ترفع إصبعك طول المدة اللي تحددها. لو رفعت إصبعك يبدأ العد من جديد.</p>
+        <div class="field">
+          <label for="emerg">مدة الضغط المطوّل (بالدقائق، أقل شيء دقيقة)</label>
+          <div class="stepper">
+            <button class="btn sq" id="emergMinus" aria-label="أنقص دقيقة">−</button>
+            <input id="emerg" type="number" min="1" max="30" step="1" inputmode="numeric">
+            <button class="btn sq" id="emergPlus" aria-label="زد دقيقة">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">صوت المنبه</div>
+        <label class="switch-row">
+          <span><b>يبدأ بأذان الفجر</b><small>يشغّل الأذان أولاً ثم يكمّل بصوت المنبه</small></span>
+          <input type="checkbox" id="fajrAdhanFirst" class="sw">
+        </label>
+        <div class="field"><label for="fajrSound">أذان الفجر</label><select id="fajrSound"></select></div>
+        <div class="field"><label for="alarmSound">صوت المنبه بعد الأذان</label><select id="alarmSound"></select></div>
+        <div class="btns"><button class="btn" id="testAlarm">جرّب المنبه الحين</button></div>
+      </div>
+
+      <div class="panel" id="permPanel">
+        <div class="panel-h">صلاحيات لازمة عشان يرن المنبه</div>
+        <ul class="perms" id="perms"></ul>
+      </div>
+    </section>
+
+    <!-- الأذكار -->
+    <section class="view" id="v-azkar" hidden>
+      <h2 class="h">الأذكار</h2>
+      <div class="chips" id="azkarChips" role="tablist"></div>
+      <div id="azkarBody"></div>
+    </section>
+
+    <!-- القرآن -->
+    <section class="view" id="v-quran" hidden>
+      <div id="quranList">
+        <h2 class="h">القرآن الكريم</h2>
+        <button class="resume" id="resume" hidden></button>
+        <input class="search" id="surahSearch" type="search" placeholder="ابحث باسم السورة أو رقمها">
+        <ol class="surahs" id="surahs"></ol>
+      </div>
+      <div id="reader" hidden>
+        <div class="reader-bar">
+          <button class="btn sq" id="readerBack" aria-label="رجوع">→</button>
+          <div class="reader-title" id="readerTitle"></div>
+          <button class="btn sq" id="fontMinus" aria-label="تصغير الخط">ـأ</button>
+          <button class="btn sq" id="fontPlus" aria-label="تكبير الخط">أ+</button>
+        </div>
+        <div class="mushaf" id="mushaf"></div>
+        <div class="reader-nav">
+          <button class="btn" id="nextSurah">السورة التالية</button>
+          <button class="btn" id="listenSurah">استمع للسورة</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- الإعدادات -->
+    <section class="view" id="v-prefs" hidden>
+      <h2 class="h">الموقع والمواقيت</h2>
+      <div class="panel">
+        <button class="btn primary wide" id="useGps">تحديد موقعي تلقائياً</button>
+        <div class="gps-msg" id="gpsMsg"></div>
+        <div class="field"><label for="city">أو اختر مدينتك</label><select id="city"></select></div>
+        <div class="field"><label for="method">طريقة الحساب</label><select id="method"></select></div>
+        <div class="field"><label for="madhab">وقت العصر</label>
+          <select id="madhab"><option value="Shafi">الجمهور (ظل المثل)</option><option value="Hanafi">الحنفي (ظل المثلين)</option></select>
+        </div>
+      </div>
+
+      <h2 class="h">الأذان</h2>
+      <div class="panel">
+        <div class="field"><label for="adhanSound">صوت الأذان للصلوات</label><select id="adhanSound"></select></div>
+        <p class="hint">فعّل الأذان لكل صلاة من جرس الصلاة في الصفحة الرئيسية.</p>
+      </div>
+
+      <h2 class="h">مكتبة الأصوات</h2>
+      <p class="hint pad">أضف تسجيل أذان كل مؤذن من ملفات جوالك مرة وحدة، وبعدها تقدر تختاره للأذان أو للمنبه. تقدر كمان تضيف أي نغمة منبه تبيها.</p>
+      <ul class="sounds" id="sounds"></ul>
+    </section>
+  </main>
+
+  <nav class="tabs" id="tabs">
+    <button data-v="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M12 3c-1 3-4 5-4 9a4 4 0 0 0 8 0c0-4-3-6-4-9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 21h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>المواقيت</span></button>
+    <button data-v="alarm"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 9v4l2.5 2M5 4 2.5 6.5M19 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>المنبه</span></button>
+    <button data-v="azkar"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="15.5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6.5" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6.5" cy="15.5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 19v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="currentColor"/></svg><span>الأذكار</span></button>
+    <button data-v="quran"><svg viewBox="0 0 24 24"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5zM12 6v14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>القرآن</span></button>
+    <button data-v="prefs"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><span>الإعدادات</span></button>
+  </nav>
+</div>
+
+<!-- شاشة المنبه -->
+<div id="ring" hidden>
+  <div class="ring-sky" aria-hidden="true"></div>
+  <div class="ring-in" id="ringMain">
+    <div class="ring-time" id="ringTime">--:--</div>
+    <div class="ring-title">حان وقت صلاة الفجر</div>
+    <div class="ring-sub">الصلاة خيرٌ من النوم</div>
+    <div class="ring-actions">
+      <button class="btn primary huge" id="ringScan">امسح الباركود لإيقاف المنبه</button>
+      <div class="hold-wrap">
+        <button class="hold" id="holdBtn"><span class="hold-fill" id="holdFill"></span><span class="hold-txt" id="holdTxt">زر الطوارئ</span></button>
+        <div class="hold-hint" id="holdHint"></div>
+      </div>
+    </div>
+  </div>
+  <div class="ring-in" id="ringDone" hidden>
+    <div class="done-mark">✓</div>
+    <div class="ring-title">صباح الخير</div>
+    <p class="dua">الحمدُ للهِ الذي أحيانا بعدما أماتنا وإليه النُّشور</p>
+    <div class="ring-actions">
+      <button class="btn primary huge" id="goMorning">أذكار الصباح</button>
+      <button class="btn huge" id="ringClose">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- الماسح -->
+<div id="scanner" hidden>
+  <div class="scan-in">
+    <div class="scan-title" id="scanTitle">وجّه الكاميرا على الباركود</div>
+    <div id="qrReader"></div>
+    <div class="scan-msg" id="scanMsg"></div>
+    <div class="btns">
+      <label class="btn" for="scanPhoto">تصوير الباركود بدل البث المباشر</label>
+      <input type="file" id="scanPhoto" accept="image/*" capture="environment" hidden>
+      <button class="btn" id="scanClose">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="lib/adhan.umd.min.js"></script>
+<script src="lib/html5-qrcode.min.js"></script>
+<script src="azkar.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

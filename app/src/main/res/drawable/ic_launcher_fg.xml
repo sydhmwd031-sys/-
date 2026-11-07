@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- هلال -->
+    <path android:fillColor="#EEF0FB"
+        android:pathData="M60,30a16,16 0,1 0,10 28a13,13 0,1 1,-10 -28z"/>
+    <!-- خط الفجر -->
+    <path android:fillColor="#F3B562" android:pathData="M30,70h48v4H30z"/>
+    <path android:fillColor="#E98A5A" android:pathData="M38,77h32v3H38z"/>
+</vector>
