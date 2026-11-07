@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="night">#0C1230</color>
-    <color name="night_surface">#141B40</color>
-    <color name="dawn">#F3B562</color>
+    <color name="night">#0D2A2C</color>
+    <color name="night_surface">#123436</color>
+    <color name="dawn">#D8A24A</color>
 </resources>

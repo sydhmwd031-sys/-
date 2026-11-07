@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0d2a2c">
 <title>منبه الفجر</title>
 <link rel="stylesheet" href="app.css">
 </head>
@@ -39,8 +40,8 @@
       <ul class="prayers" id="prayerList"></ul>
 
       <div class="row2">
-        <div class="tile">
-          <div class="tile-k">القبلة</div>
+        <button class="tile tile-btn" id="qiblaTile">
+          <div class="tile-k">القبلة · اضغط للبوصلة</div>
           <div class="qibla">
             <svg viewBox="0 0 64 64" class="compass" aria-hidden="true">
               <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="1.5"/>
@@ -49,7 +50,7 @@
             </svg>
             <div><span class="big-num" id="qiblaDeg">—</span><small>° من الشمال</small></div>
           </div>
-        </div>
+        </button>
         <button class="tile tile-btn" id="alarmTile">
           <div class="tile-k">منبه الفجر</div>
           <div class="big-num" id="alarmAtTile">—</div>
@@ -263,7 +264,39 @@
   </div>
 </div>
 
-<div class="toast" id="toast" role="status" hidden></div>
+<!-- القبلة الحية -->
+<div id="qiblaView" hidden>
+  <div class="m-bar">
+    <button class="m-btn" id="qbBack" aria-label="رجوع"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="m-title"><b>اتجاه القبلة</b><small id="qbPlace">—</small></div>
+    <span style="width:44px"></span>
+  </div>
+  <div class="qb-stage">
+    <div class="qb-pointer" aria-hidden="true"></div>
+    <div class="qb-dial" id="qbDial">
+      <svg viewBox="0 0 300 300" aria-hidden="true">
+        <circle cx="150" cy="150" r="140" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="1.5"/>
+        <g id="qbTicks"></g>
+        <text x="150" y="44" text-anchor="middle" class="qb-n">ش</text>
+        <text x="150" y="268" text-anchor="middle" class="qb-c">ج</text>
+        <text x="262" y="156" text-anchor="middle" class="qb-c">ق</text>
+        <text x="38" y="156" text-anchor="middle" class="qb-c">غ</text>
+        <g id="qbKaaba">
+          <line x1="150" y1="150" x2="150" y2="40" stroke="var(--brass)" stroke-width="3" stroke-linecap="round"/>
+          <g transform="translate(150 26)"><rect x="-13" y="-13" width="26" height="26" rx="3" fill="#111"/><rect x="-13" y="-6" width="26" height="4" fill="var(--brass)"/></g>
+        </g>
+        <circle cx="150" cy="150" r="7" fill="var(--brass)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="qb-info">
+    <div class="qb-state" id="qbState">جاري تشغيل البوصلة…</div>
+    <div class="qb-deg"><span id="qbDeg">—</span></div>
+    <p class="hint" id="qbHint">امسك الجوال مستوي وأدره لين تصير الكعبة تحت المؤشر الذهبي.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="lib/adhan.umd.min.js"></script>
 <script src="lib/html5-qrcode.min.js"></script>
@@ -271,5 +304,6 @@
 <script src="azkar.js"></script>
 <script src="app.js"></script>
 <script src="mushaf.js"></script>
+<script src="qibla.js"></script>
 </body>
 </html>

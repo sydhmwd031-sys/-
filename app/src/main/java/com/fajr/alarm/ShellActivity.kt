@@ -8,6 +8,11 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.hardware.GeomagneticField
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
@@ -68,8 +73,8 @@ open class ShellActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = Color.parseColor("#0c1230")
-        window.navigationBarColor = Color.parseColor("#141b40")
+        window.statusBarColor = Color.parseColor("#0d2a2c")
+        window.navigationBarColor = Color.parseColor("#123436")
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -78,7 +83,7 @@ open class ShellActivity : ComponentActivity() {
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
         web = WebView(this)
-        web.setBackgroundColor(Color.parseColor("#0c1230"))
+        web.setBackgroundColor(Color.parseColor("#0d2a2c"))
         web.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -198,9 +203,58 @@ open class ShellActivity : ComponentActivity() {
         }.start()
     }
 
+    // ---------- البوصلة (اتجاه القبلة الحي) ----------
+    private var compass: SensorEventListener? = null
+    private var declination = 0f
+    private var lastSent = 0L
+
+    fun startCompass(lat: Double, lng: Double) {
+        stopCompass()
+        val sm = getSystemService(SensorManager::class.java) ?: return
+        val rv = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+        if (rv == null) { js("window.onHeading && window.onHeading(null, 0)"); return }
+        declination = try { GeomagneticField(lat.toFloat(), lng.toFloat(), 0f, System.currentTimeMillis()).declination } catch (e: Exception) { 0f }
+        val rot = FloatArray(9); val ori = FloatArray(3)
+        var acc = 3
+        compass = object : SensorEventListener {
+            override fun onSensorChanged(e: SensorEvent) {
+                val now = System.currentTimeMillis(); if (now - lastSent < 50) return
+                lastSent = now
+                SensorManager.getRotationMatrixFromVector(rot, e.values)
+                SensorManager.getOrientation(rot, ori)
+                var deg = Math.toDegrees(ori[0].toDouble()).toFloat() + declination
+                deg = (deg + 360f) % 360f
+                js("window.onHeading && window.onHeading(" + deg + "," + acc + ")")
+            }
+            override fun onAccuracyChanged(s: Sensor?, a: Int) { acc = a }
+        }
+        sm.registerListener(compass, rv, SensorManager.SENSOR_DELAY_GAME)
+    }
+
+    fun stopCompass() {
+        compass?.let { getSystemService(SensorManager::class.java)?.unregisterListener(it) }
+        compass = null
+    }
+
+    override fun onPause() { super.onPause(); if (compass != null) { stopCompass(); js("window.onCompassPaused && window.onCompassPaused()") } }
+
     // ---------- الجسر ----------
     inner class Bridge {
         @JavascriptInterface fun isNative(): Boolean = true
+        @JavascriptInterface fun startCompass(lat: Double, lng: Double) = runOnUiThread { this@ShellActivity.startCompass(lat, lng) }
+        @JavascriptInterface fun stopCompass() = runOnUiThread { this@ShellActivity.stopCompass() }
+        @JavascriptInterface fun vibrate(ms: Int) {
+            try {
+                val v: android.os.Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    getSystemService(android.os.VibratorManager::class.java)?.defaultVibrator
+                } else {
+                    @Suppress("DEPRECATION")
+                    val old = getSystemService(VIBRATOR_SERVICE) as? android.os.Vibrator
+                    old
+                }
+                v?.vibrate(android.os.VibrationEffect.createOneShot(ms.toLong().coerceIn(5, 400), android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+            } catch (_: Exception) { }
+        }
 
         @JavascriptInterface fun saveSchedule(events: String, config: String) {
             val p = Prefs(this@ShellActivity); p.events = events; p.config = config

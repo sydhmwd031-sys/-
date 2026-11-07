@@ -286,3 +286,28 @@ select,input[type=number],.search{width:100%;min-height:48px;border-radius:14px;
 
 @media (prefers-reduced-motion: reduce){.ring-sky{animation:none}*{transition:none!important;animation:none!important}}
 @media (max-width:360px){.next-count{font-size:2.5rem}.row2{grid-template-columns:1fr}}
+
+/* القبلة الحية */
+#qiblaView{position:fixed;inset:0;z-index:45;background:var(--bg);display:flex;flex-direction:column;overscroll-behavior:contain;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.qb-stage{flex:1;display:grid;place-items:center;position:relative;min-height:0}
+.qb-dial{width:min(84vw,360px);aspect-ratio:1;max-width:100%;border-radius:50%;color:var(--ink);
+  background:var(--star-soft) center/44px, radial-gradient(circle,var(--surface2),var(--surface) 70%);border:1px solid var(--line);
+  transition:transform .12s linear, box-shadow .3s}
+.qb-dial svg{width:100%;height:100%}
+.qb-dial .qb-n{font-family:var(--f-display);font-weight:700;font-size:20px;fill:var(--bad)}
+.qb-dial .qb-c{font-family:var(--f-display);font-size:16px;fill:var(--muted)}
+.qb-pointer{position:absolute;top:calc(50% - min(42vw,180px) - 22px);left:50%;width:0;height:0;margin-left:-12px;border:12px solid transparent;border-top:18px solid var(--brass);z-index:2}
+#qiblaView.aligned .qb-dial{box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 55%,transparent),0 0 60px color-mix(in srgb,var(--ok) 40%,transparent)}
+.qb-info{flex:none;text-align:center;padding:12px 24px 22px;display:flex;flex-direction:column;gap:6px}
+.qb-state{font-family:var(--f-display);font-weight:700;font-size:1.4rem}
+#qiblaView.aligned .qb-state{color:var(--ok)}
+.qb-deg{font-variant-numeric:tabular-nums;color:var(--muted)}
+/* لمسات من مراجعة إرشادات الواجهات */
+button,.btn,.chip,.bell,.m-btn{touch-action:manipulation}
+.btn:active,.chip:active,.bell:active,.m-btn:active,.tile-btn:active,.zk:active{transform:scale(.97)}
+.btn,.chip,.bell,.m-btn,.tile-btn,.zk{transition:transform .12s ease,background-color .2s,border-color .2s,color .2s}
+.btn:hover{border-color:var(--brass)}
+#sheet .sheet-card,.t-body,.m-text{overscroll-behavior:contain}
+select{background-color:var(--surface2);color:var(--ink)}
+.index li{content-visibility:auto;contain-intrinsic-size:auto 62px}

@@ -548,7 +548,7 @@ $('#sounds').addEventListener('click', e => {
   if (!N){ toast('تحميل الأصوات وإضافتها في تطبيق الأندرويد'); return; }
   if (b.dataset.dl) downloadSound(b.dataset.dl);
   else if (b.dataset.pick) N.pickSound(b.dataset.pick);
-  else if (b.dataset.del){ N.deleteSound(b.dataset.del); ['fajrSound','alarmSound','adhanSound'].forEach(k => { if (S[k] === b.dataset.del) S[k] = k === 'alarmSound' ? 'tone_sunrise' : ''; }); save(); renderSounds(); sync(); }
+  else if (b.dataset.del){ if (b.dataset.sure !== '1'){ b.dataset.sure = '1'; b.textContent = 'تأكيد الحذف'; setTimeout(() => { if (b.isConnected){ b.dataset.sure = ''; b.textContent = 'حذف'; } }, 3000); return; } N.deleteSound(b.dataset.del); ['fajrSound','alarmSound','adhanSound'].forEach(k => { if (S[k] === b.dataset.del) S[k] = k === 'alarmSound' ? 'tone_sunrise' : ''; }); save(); renderSounds(); sync(); }
 });
 window.onSoundFailed = slot => { downloading.delete(slot); renderSounds(); toast('ما قدرت أحمّل الصوت. تأكد من النت وجرّب مرة ثانية'); };
 window.onSoundPicked = (slot, name) => {
