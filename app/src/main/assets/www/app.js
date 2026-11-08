@@ -77,7 +77,7 @@ const DEF = {
   fajrOn:true, offset:0, barcode:null, emerg:2,
   fajrAdhanFirst:true, fajrSound:'', alarmSound:'tone_sunrise', adhanSound:'',
   adhan:{fajr:false, dhuhr:true, asr:true, maghrib:true, isha:true},
-  lastPage:1, marks:[], tafsir:'muyassar'
+  lastPage:1, marks:[], tafsir:'muyassar', theme:'sun'
 };
 function loadS(){ try{ const v = JSON.parse(localStorage.getItem('fajr.settings') || 'null'); return v ? Object.assign({}, DEF, v, {adhan:Object.assign({}, DEF.adhan, v.adhan||{})}) : structuredClone(DEF); }catch(e){ return structuredClone(DEF); } }
 let S = loadS();
@@ -170,7 +170,7 @@ function tick(){
   const np = nextPrayer(now); let s = Math.max(0, Math.floor((np.at - now)/1000));
   const h = Math.floor(s/3600), m = Math.floor(s%3600/60), sec = s%60;
   $('#nextCount').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-  if (tick._min !== now.getMinutes()){ tick._min = now.getMinutes(); renderHome(); }
+  if (tick._min !== now.getMinutes()){ tick._min = now.getMinutes(); renderHome(); applyTheme(); }
   if (RING_MODE || ringing) $('#ringTime').textContent = fmt(now);
   webTimers(now);
 }
@@ -559,9 +559,42 @@ window.onSoundPicked = (slot, name) => {
 };
 window.onPreviewEnded = () => { playing = null; renderSounds(); };
 
+
+/* ========== المظهر الليلي والنهاري ========== */
+const SUN_ICO = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>';
+const MOON_ICO = '<svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg>';
+const THEME_NAMES = {sun:'تلقائي حسب الشمس', system:'حسب الجوال', light:'نهاري', dark:'ليلي'};
+function isDayNow(){
+  const now = new Date(), t = timesFor(0);
+  return now >= t.sunrise && now < t.maghrib;
+}
+function effectiveLight(){
+  const m = S.theme || 'sun';
+  if (m === 'light') return true; if (m === 'dark') return false;
+  if (m === 'sun') return isDayNow();
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+}
+let _lastLight = null;
+function applyTheme(){
+  const light = effectiveLight();
+  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn'); if (btn) btn.innerHTML = light ? SUN_ICO : MOON_ICO;
+  document.querySelectorAll('#themePick button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === (S.theme || 'sun')));
+  const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = light ? '#edf3f0' : '#0d2a2c';
+  if (light !== _lastLight){ _lastLight = light; if (N && N.setBars) try { N.setBars(light); } catch(e){} }
+}
+function setTheme(m){ S.theme = m; save(); applyTheme(); toast('المظهر: ' + THEME_NAMES[m]); }
+document.getElementById('themeBtn').onclick = () => {
+  // الزر يبدّل بسرعة بين النهاري والليلي؛ الخيارات التلقائية في الإعدادات
+  setTheme(effectiveLight() ? 'dark' : 'light');
+};
+document.getElementById('themePick').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setTheme(b.dataset.m); });
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: light)').addEventListener?.('change', applyTheme);
+
 /* ========== تشغيل ========== */
 function boot(){
   if (typeof adhan === 'undefined'){ document.body.innerHTML = '<p style="padding:24px">تعذّر تحميل مكتبة المواقيت.</p>'; return; }
+  applyTheme();
   initAlarmTab(); initPrefs(); renderChips(); renderHome(); tick();
   setInterval(tick, 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden){ renderHome(); renderPerms(); } });

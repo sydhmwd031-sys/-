@@ -241,6 +241,16 @@ open class ShellActivity : ComponentActivity() {
     // ---------- الجسر ----------
     inner class Bridge {
         @JavascriptInterface fun isNative(): Boolean = true
+        @JavascriptInterface fun setBars(light: Boolean) = runOnUiThread {
+            val bar = Color.parseColor(if (light) "#edf3f0" else "#0d2a2c")
+            val nav = Color.parseColor(if (light) "#ffffff" else "#123436")
+            @Suppress("DEPRECATION")
+            run { window.statusBarColor = bar; window.navigationBarColor = nav }
+            if (::web.isInitialized) web.setBackgroundColor(bar)
+            val c = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+            c.isAppearanceLightStatusBars = light
+            c.isAppearanceLightNavigationBars = light
+        }
         @JavascriptInterface fun startCompass(lat: Double, lng: Double) = runOnUiThread { this@ShellActivity.startCompass(lat, lng) }
         @JavascriptInterface fun stopCompass() = runOnUiThread { this@ShellActivity.stopCompass() }
         @JavascriptInterface fun vibrate(ms: Int) {

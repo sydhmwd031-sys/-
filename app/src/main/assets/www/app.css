@@ -33,6 +33,7 @@
     --ok:#1e8a5f; --warn:#a8650c; --bad:#c23d33; color-scheme:light;
   }
 }
+/* النهاري */
 :root[data-theme="light"]{
   --bg:#edf3f0; --surface:#ffffff; --surface2:#f3f8f6; --line:#d2e0db;
   --ink:#10302e; --muted:#4e6d68; --brass:#986812; --brass-ink:#fffaf0; --glow:#b07a1c;
@@ -54,6 +55,12 @@ small{color:var(--muted)}
 .hijri{font-family:var(--f-display);font-weight:600;font-size:1.05rem}
 .place{color:var(--muted);font-size:.84rem}
 .clock{font-family:var(--f-display);font-weight:700;font-size:1.5rem;color:var(--brass)}
+.top-end{display:flex;align-items:center;gap:10px}
+.theme-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--brass);touch-action:manipulation}
+.theme-btn svg{width:20px;height:20px}
+.theme-pick{display:flex;gap:8px;flex-wrap:wrap}
+.theme-pick button{flex:1 1 40%;min-height:46px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);cursor:pointer;font-weight:600}
+.theme-pick button[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:var(--brass-ink)}
 
 main{padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));padding-block:8px calc(var(--tabh) + 28px + env(safe-area-inset-bottom,0px))}
 .view{display:flex;flex-direction:column;gap:14px;max-width:620px;margin-inline:auto}
@@ -250,7 +257,10 @@ select,input[type=number],.search{width:100%;min-height:48px;border-radius:14px;
 /* شاشة المنبه */
 #ring{position:fixed;inset:0;z-index:70;background:#081d1f;color:#f6efe0;display:flex;align-items:center;justify-content:center;overflow:hidden;
   padding:env(safe-area-inset-top,0px) max(18px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(18px,env(safe-area-inset-left,0px))}
-.ring-sky{position:absolute;inset:0;background:var(--star) center/64px, radial-gradient(120% 70% at 50% 110%,#f0b45a 0%,#d77a48 22%,#3d4f64 48%,#081d1f 76%);animation:breathe 3s ease-in-out infinite;opacity:.95}
+.ring-sky{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 110%,#f0b45a 0%,#d77a48 22%,#3d4f64 48%,#081d1f 76%);animation:breathe 3s ease-in-out infinite}
+.ring-sky::after{content:"";position:absolute;inset:0;background:var(--star-soft) center/72px;opacity:.5;
+  -webkit-mask-image:radial-gradient(60% 45% at 50% 45%,transparent 30%,#000 85%);mask-image:radial-gradient(60% 45% at 50% 45%,transparent 30%,#000 85%)}
+.ring-in{text-shadow:0 2px 18px rgba(0,0,0,.55)}
 @keyframes breathe{0%,100%{opacity:.75}50%{opacity:1}}
 .ring-in{position:relative;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .ring-time{font-family:var(--f-display);font-weight:700;font-size:4.6rem;line-height:1}

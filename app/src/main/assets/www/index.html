@@ -16,7 +16,10 @@
         <div class="hijri" id="hijri">—</div>
         <div class="place" id="placeLabel">—</div>
       </div>
-      <div class="clock" id="clock">--:--</div>
+      <div class="top-end">
+        <div class="clock" id="clock">--:--</div>
+        <button class="theme-btn" id="themeBtn" aria-label="الوضع الليلي أو النهاري"></button>
+      </div>
     </div>
   </header>
 
@@ -147,6 +150,17 @@
         <div class="field"><label for="madhab">وقت العصر</label>
           <select id="madhab"><option value="Shafi">الجمهور (ظل المثل)</option><option value="Hanafi">الحنفي (ظل المثلين)</option></select>
         </div>
+      </div>
+
+      <h2 class="h">المظهر</h2>
+      <div class="panel">
+        <div class="theme-pick" id="themePick" role="group" aria-label="المظهر">
+          <button data-m="sun" aria-pressed="false">تلقائي حسب الشمس</button>
+          <button data-m="system" aria-pressed="false">حسب الجوال</button>
+          <button data-m="light" aria-pressed="false">نهاري</button>
+          <button data-m="dark" aria-pressed="false">ليلي</button>
+        </div>
+        <p class="hint">«تلقائي حسب الشمس» يخلي التطبيق نهاري من الشروق للمغرب، وليلي بعدها.</p>
       </div>
 
       <h2 class="h" id="soundsTitle">الأصوات</h2>
