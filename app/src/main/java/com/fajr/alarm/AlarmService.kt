@@ -107,6 +107,7 @@ class AlarmService : Service() {
             am.setStreamVolume(AudioManager.STREAM_ALARM, am.getStreamMaxVolume(AudioManager.STREAM_ALARM), 0)
         } catch (_: Exception) { }
 
+        startVolumeGuard()
         startVibration()
 
         val cfg = Prefs(this).configJson()
@@ -119,6 +120,25 @@ class AlarmService : Service() {
         }
         // أمان: لو ما أحد أوقفه خلال ساعة، يوقف لحاله
         handler.postDelayed({ stopEverything() }, 60 * 60_000L)
+    }
+
+    /** قفل الصوت: طول ما المنبه يرن، أي تخفيض لصوت المنبه يرجع للأعلى خلال ربع ثانية. */
+    private val volumeGuard = object : Runnable {
+        override fun run() {
+            if (!isAlarmRunning) return
+            try {
+                val am = getSystemService(AudioManager::class.java)
+                val max = am.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+                if (am.getStreamVolume(AudioManager.STREAM_ALARM) < max) am.setStreamVolume(AudioManager.STREAM_ALARM, max, 0)
+                player?.setVolume(1f, 1f)
+            } catch (_: Exception) { }
+            handler.postDelayed(this, 250L)
+        }
+    }
+
+    private fun startVolumeGuard() {
+        handler.removeCallbacks(volumeGuard)
+        handler.postDelayed(volumeGuard, 250L)
     }
 
     private fun playAlarmLoop() {

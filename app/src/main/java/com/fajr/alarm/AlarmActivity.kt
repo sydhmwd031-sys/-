@@ -2,6 +2,7 @@ package com.fajr.alarm
 
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 
@@ -24,5 +25,18 @@ class AlarmActivity : ShellActivity() {
             }
         })
         setupWeb("index.html?mode=ring")
+    }
+
+    /** أزرار الصوت ما تشتغل والمنبه يرن. */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val volumeKey = event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || event.keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
+            event.keyCode == KeyEvent.KEYCODE_VOLUME_MUTE
+        if (volumeKey && Prefs(this).ringing) {
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                js("window.toast && toast('الصوت مقفل لين توقف المنبه')")
+            }
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 }
