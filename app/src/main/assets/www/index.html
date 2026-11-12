@@ -66,16 +66,19 @@
     <section class="view" id="v-alarm" hidden>
       <h2 class="h">منبه الفجر</h2>
 
-      <div class="panel">
-        <label class="switch-row">
-          <span><b>تشغيل منبه الفجر</b><small>يرن حتى لو الجوال مقفل والتطبيق مسكّر</small></span>
-          <input type="checkbox" id="fajrOn" class="sw">
-        </label>
+      <div class="alarm-hero" id="alarmHero">
+        <div class="ah-top">
+          <div>
+            <div class="ah-k" id="alarmDay">—</div>
+            <div class="ah-time" id="alarmBig">—</div>
+          </div>
+          <input type="checkbox" id="fajrOn" class="sw big" aria-label="تشغيل منبه الفجر">
+        </div>
+        <div class="next-alarm" id="alarmNextLine">—</div>
         <div class="field">
           <label for="offset">وقت الرنين بالنسبة لأذان الفجر</label>
           <select id="offset"></select>
         </div>
-        <div class="next-alarm" id="alarmNextLine">—</div>
       </div>
 
       <div class="panel">
@@ -123,6 +126,7 @@
     <section class="view" id="v-azkar" hidden>
       <h2 class="h">الأذكار</h2>
       <div class="chips" id="azkarChips" role="tablist"></div>
+      <div class="zk-bar" aria-hidden="true"><i id="zkBar"></i></div>
       <div id="azkarBody"></div>
     </section>
 
@@ -313,8 +317,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="lib/adhan.umd.min.js"></script>
-<script src="lib/html5-qrcode.min.js"></script>
-<script src="lib/qrcode.js"></script>
 <script src="azkar.js"></script>
 <script src="app.js"></script>
 <script src="mushaf.js"></script>

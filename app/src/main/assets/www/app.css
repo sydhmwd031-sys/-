@@ -1,16 +1,16 @@
 /* ليل المدينة: أخضر مصحفي عميق ونحاس فانوس المسجد. المحراب هو العنصر الوحيد اللافت؛ الباقي هادئ.
    الخطوط: المسيري للعناوين، ريدكس للواجهة، أميري للأذكار، وخط مجمع الملك فهد لصفحات المصحف. */
-@font-face{font-family:"Messiri";src:url(fonts/el-messiri-arabic-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
-@font-face{font-family:"Messiri";src:url(fonts/el-messiri-arabic-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
-@font-face{font-family:"Messiri";src:url(fonts/el-messiri-latin-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0000-00FF,U+2000-206F}
-@font-face{font-family:"Messiri";src:url(fonts/el-messiri-latin-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0000-00FF,U+2000-206F}
-@font-face{font-family:"Readex";src:url(fonts/readex-pro-arabic-400-normal.woff2) format("woff2");font-weight:400;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
-@font-face{font-family:"Readex";src:url(fonts/readex-pro-arabic-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
-@font-face{font-family:"Readex";src:url(fonts/readex-pro-latin-400-normal.woff2) format("woff2");font-weight:400;unicode-range:U+0000-00FF,U+2000-206F}
-@font-face{font-family:"Readex";src:url(fonts/readex-pro-latin-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0000-00FF,U+2000-206F}
-@font-face{font-family:"Amiri";src:url(fonts/amiri-arabic-400-normal.woff2) format("woff2");font-weight:400}
-@font-face{font-family:"Amiri";src:url(fonts/amiri-arabic-700-normal.woff2) format("woff2");font-weight:700}
-@font-face{font-family:"Amiri Quran";src:url(fonts/amiri-quran-arabic-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Messiri";font-display:swap;src:url(fonts/el-messiri-arabic-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Messiri";font-display:swap;src:url(fonts/el-messiri-arabic-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Messiri";font-display:swap;src:url(fonts/el-messiri-latin-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:"Messiri";font-display:swap;src:url(fonts/el-messiri-latin-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:"Readex";font-display:swap;src:url(fonts/readex-pro-arabic-400-normal.woff2) format("woff2");font-weight:400;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Readex";font-display:swap;src:url(fonts/readex-pro-arabic-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Readex";font-display:swap;src:url(fonts/readex-pro-latin-400-normal.woff2) format("woff2");font-weight:400;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:"Readex";font-display:swap;src:url(fonts/readex-pro-latin-600-normal.woff2) format("woff2");font-weight:600;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:"Amiri";font-display:swap;src:url(fonts/amiri-arabic-400-normal.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"Amiri";font-display:swap;src:url(fonts/amiri-arabic-700-normal.woff2) format("woff2");font-weight:700}
+@font-face{font-family:"Amiri Quran";font-display:swap;src:url(fonts/amiri-quran-arabic-400-normal.woff2) format("woff2")}
 
 :root{
   --bg:#0d2a2c; --surface:#123436; --surface2:#184246; --line:#29585b;
@@ -79,7 +79,7 @@ main{padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px
 .next-name{font-family:var(--f-display);font-weight:700;font-size:2.4rem;line-height:1.25;color:var(--brass)}
 .next-count{font-family:var(--f-display);font-weight:700;font-size:3.1rem;line-height:1.15;direction:ltr;letter-spacing:.02em}
 .next-at{color:var(--muted);font-size:.9rem}
-.dayline{margin-top:18px}
+.dayline{margin-top:18px;padding-inline:14px}
 .dayline-track{position:relative;height:4px;border-radius:2px;background:color-mix(in srgb,var(--brass) 25%,transparent);direction:ltr}
 .dayline-track .tick{position:absolute;top:-4px;width:2px;height:12px;background:var(--muted);border-radius:1px}
 .dayline-track .tick.next{background:var(--brass);width:3px}
@@ -187,7 +187,9 @@ select,input[type=number],.search{width:100%;min-height:48px;border-radius:14px;
 .tasbih-phrase{font-family:var(--f-text);font-size:1.5rem;text-align:center}
 
 /* فهرس المصحف */
-.resume{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:64px;border-radius:18px;border:1px solid var(--brass);background:var(--star) left/44px, linear-gradient(90deg,var(--surface),color-mix(in srgb,var(--brass) 14%,var(--surface)));padding:0 16px;cursor:pointer;text-align:right}
+.resume{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:72px;border-radius:18px;border:1px solid var(--brass);background:linear-gradient(90deg,color-mix(in srgb,var(--brass) 16%,var(--surface)),var(--surface) 55%);padding:0 18px;cursor:pointer;text-align:right}
+.resume::before{content:"";position:absolute;inset:0 auto 0 0;width:42%;background:var(--star-soft) left center/44px;-webkit-mask-image:linear-gradient(90deg,#000,transparent);mask-image:linear-gradient(90deg,#000,transparent);pointer-events:none}
+.resume > *{position:relative}
 .resume b{display:block;font-family:var(--f-display);font-size:1.12rem;color:var(--brass)}
 .resume small{display:block}
 .index{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:18px}
@@ -321,3 +323,27 @@ button,.btn,.chip,.bell,.m-btn{touch-action:manipulation}
 #sheet .sheet-card,.t-body,.m-text{overscroll-behavior:contain}
 select{background-color:var(--surface2);color:var(--ink)}
 .index li{content-visibility:auto;contain-intrinsic-size:auto 62px}
+
+/* بطاقة المنبه */
+.alarm-hero{position:relative;overflow:hidden;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--brass);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--brass) 14%,var(--surface)),var(--surface) 60%)}
+.alarm-hero::before{content:"";position:absolute;inset:0 auto auto 0;width:55%;height:70%;background:var(--star-soft) left top/52px;-webkit-mask-image:radial-gradient(120% 120% at 0 0,#000,transparent 70%);mask-image:radial-gradient(120% 120% at 0 0,#000,transparent 70%);pointer-events:none}
+.alarm-hero > *{position:relative}
+.alarm-hero.off{border-color:var(--line);background:var(--surface)}
+.alarm-hero.off .ah-time{color:var(--muted)}
+.ah-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ah-k{color:var(--muted);font-size:.86rem}
+.ah-time{font-family:var(--f-display);font-weight:700;font-size:3.2rem;line-height:1.15;color:var(--brass);font-variant-numeric:tabular-nums}
+.sw.big{width:64px;height:36px;border-radius:18px}
+.sw.big::after{width:30px;height:30px}
+.sw.big:checked::after{transform:translateX(-28px)}
+/* شريط تقدم الأذكار */
+.zk-bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:-4px}
+.zk-bar i{display:block;height:100%;width:0;background:var(--brass);border-radius:2px;transition:width .3s ease;margin-inline-start:0}
+/* الصلاة القادمة في القائمة */
+.prayers .left{display:block;font-family:var(--f-ui);font-weight:400;font-size:.78rem;color:var(--muted)}
+.prayers li.is-past .pn::after{content:" ✓";color:var(--ok);font-size:.8em}
+/* دخول التبويب */
+.view:not([hidden]){animation:viewIn .22s ease-out}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}}
+@media (prefers-reduced-motion: reduce){.view:not([hidden]){animation:none}}

@@ -87,6 +87,8 @@ function save(){ try{ localStorage.setItem('fajr.settings', JSON.stringify(S)); 
 
 const ar = n => Number(n).toLocaleString('ar-SA');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const _scripts = {};
+function loadScript(src){ return _scripts[src] || (_scripts[src] = new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => { delete _scripts[src]; rej(new Error(src)); }; document.head.appendChild(el); })); }
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 2600); }
 
 /* ========== الموقع والمواقيت ========== */
@@ -146,7 +148,9 @@ function renderHome(){
   $('#prayerList').innerHTML = PRAYERS.map(p => {
     const at = t[p.k]; const past = at <= now; const isNext = (np.k === p.k && at.getTime() === np.at.getTime());
     const on = !!S.adhan[p.k];
-    return `<li class="${isNext ? 'is-next' : past ? 'is-past' : ''}"><span class="pn">${p.n}</span><span class="time">${fmt(at)}</span>
+    const mins = Math.max(0, Math.round((at - now) / 60000));
+    const left = isNext ? `<span class="left">بعد ${mins >= 60 ? ar(Math.floor(mins/60)) + ' س ' : ''}${ar(mins % 60)} د</span>` : '';
+    return `<li class="${isNext ? 'is-next' : past ? 'is-past' : ''}"><span class="pn">${p.n}${left}</span><span class="time">${fmt(at)}</span>
       <button class="bell" data-p="${p.k}" aria-pressed="${on}" aria-label="أذان ${p.n}" ${p.noAdhan ? 'disabled' : ''}>${BELL}</button></li>`;
   }).join('');
   // خط اليوم
@@ -185,6 +189,7 @@ function show(v){
   document.querySelectorAll('.view').forEach(x => x.hidden = x.id !== 'v-' + v);
   document.querySelectorAll('.tabs button').forEach(b => { if (b.dataset.v === v) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   if (v === 'alarm') renderPerms();
+  if (v === 'azkar' && !azkarReady){ azkarReady = true; renderAzkar(); }
   if (v === 'quran' && window.initQuranIndex) window.initQuranIndex();
   window.scrollTo(0,0);
 }
@@ -217,7 +222,11 @@ function sync(){
 /* ========== المنبه ========== */
 function renderAlarmLine(){
   const a = nextAlarmAt(new Date());
-  $('#alarmNextLine').textContent = S.fajrOn && a ? `يرن ${dayWord(a)} الساعة ${fmt(a)}` : 'المنبه متوقف';
+  const on = S.fajrOn && a;
+  $('#alarmHero').classList.toggle('off', !on);
+  $('#alarmBig').textContent = a ? fmt(a) : '—';
+  $('#alarmDay').textContent = on ? `منبه الفجر · ${dayWord(a) || 'بعد بكرة'}` : 'منبه الفجر متوقف';
+  $('#alarmNextLine').textContent = on ? 'يرن حتى لو الجوال مقفل والتطبيق مسكّر' : 'فعّله من المفتاح عشان يرن وقت الفجر';
   renderAlarmTile();
 }
 function renderBarcode(){
@@ -233,7 +242,13 @@ function renderBarcode(){
   }
   $('#testBarcode').disabled = !S.barcode;
 }
-function haveSounds(){ try { return N ? JSON.parse(N.listSounds() || '{}') : {}; } catch(e){ return {}; } }
+let _have = null;
+function haveSounds(){
+  if (_have) return _have;
+  try { _have = N ? JSON.parse(N.listSounds() || '{}') : {}; } catch(e){ _have = {}; }
+  setTimeout(() => { _have = null; }, 0);   // صالح لنفس الدورة فقط
+  return _have;
+}
 function available(id, have){ return id.startsWith('tone_') || !!have[id]; }
 function soundOptions(sel, defLabel, list){
   const have = haveSounds();
@@ -262,7 +277,8 @@ function drawQr(code){
   g.font = '700 38px Messiri, Readex, sans-serif'; g.fillText('امسحني عشان توقف منبه الفجر', W/2, 40 + n*cell + 70);
   g.font = '600 26px Readex, sans-serif'; g.fillStyle = '#986812'; g.fillText(code, W/2, 40 + n*cell + 115);
 }
-function openQrGen(){
+async function openQrGen(){
+  try { await loadScript('lib/qrcode.js'); } catch(e){ toast('ما قدرت أجهّز الكيو آر، جرّب مرة ثانية'); return; }
   const code = newCode(); drawQr(code);
   S.barcode = code; save(); renderBarcode(); renderAlarmTile();
   $('#qrGen').hidden = false;
@@ -327,7 +343,7 @@ async function openScanner(mode){
     if (!p.camera){ pendingScan = mode; N.fixPerm('camera'); return; } }
   $('#scanner').hidden = false; $('#scanMsg').textContent = '';
   $('#scanTitle').textContent = mode === 'register' ? 'امسح باركود أو كيو آر المنتج اللي بتستخدمه للإيقاف' : 'امسح باركود الإيقاف';
-  if (typeof Html5Qrcode === 'undefined'){ $('#scanMsg').textContent = 'الماسح غير متاح، استخدم التصوير.'; return; }
+  try { await loadScript('lib/html5-qrcode.min.js'); } catch(e){ $('#scanMsg').textContent = 'الماسح غير متاح، جرّب مرة ثانية.'; return; }
   try{
     qr = new Html5Qrcode('qrReader', {verbose:false});
     await qr.start({facingMode:'environment'}, {fps:12, qrbox:(w,h) => ({width:Math.floor(Math.min(w*0.85, 320)), height:Math.floor(Math.min(h*0.5, 170))}), aspectRatio:1.333}, onCode, () => {});
@@ -358,6 +374,7 @@ $('#scanPhoto').onchange = async e => {
   const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
   try{
     if (qr && qr.isScanning) await qr.stop();
+    await loadScript('lib/html5-qrcode.min.js');
     if (!qr) qr = new Html5Qrcode('qrReader', {verbose:false});
     const text = await qr.scanFile(f, false); onCode(text);
   }catch(err){ $('#scanMsg').textContent = 'ما قدرت أقرأ الباركود من الصورة. قرّب الكاميرا وخلّ الإضاءة أوضح.'; }
@@ -432,7 +449,10 @@ let zkCat = 'morning', zkLeft = {};
 function renderChips(){
   $('#azkarChips').innerHTML = AZKAR.map(c => `<button class="chip" role="tab" data-c="${c.id}" aria-selected="${c.id===zkCat}">${c.name}</button>`).join('');
 }
-function selectAzkar(id){ zkCat = id; zkLeft = {}; renderChips(); renderAzkar(); }
+let azkarReady = false;
+function zkProgress(){ const cat = AZKAR.find(c => c.id === zkCat); const bar = $('#zkBar'); if (!cat || cat.tasbih){ bar.style.width = '0'; return; }
+  const tot = cat.items.reduce((n,z) => n + z.c, 0), left = cat.items.reduce((n,z,i) => n + (zkLeft[i] == null ? z.c : zkLeft[i]), 0); bar.style.width = (tot ? (1 - left/tot) * 100 : 0) + '%'; }
+function selectAzkar(id){ azkarReady = true; zkCat = id; zkLeft = {}; renderChips(); renderAzkar(); }
 $('#azkarChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) selectAzkar(b.dataset.c); });
 async function renderAzkar(){
   const cat = AZKAR.find(c => c.id === zkCat); const body = $('#azkarBody');
@@ -445,11 +465,12 @@ async function renderAzkar(){
     <p class="zk-t ${z.q?'q':''}">${z.q ? qText(z.q, z.b) : esc(z.t)}</p>
     <div class="zk-f"><span class="zk-n">${z.n ? esc(z.n) : z.c > 1 ? `يُقال ${ar(z.c)} مرات` : 'مرة واحدة'}</span><span class="zk-c">${zkLeft[i]===0 ? '✓' : ar(zkLeft[i])}</span></div>
   </button>`).join('')}</div>`;
+  zkProgress();
 }
 $('#azkarBody').addEventListener('click', e => {
   if (e.target.id === 'zkReset'){ zkLeft = {}; renderAzkar(); return; }
   const z = e.target.closest('.zk'); if (!z) return; const i = +z.dataset.i;
-  if (zkLeft[i] > 0){ zkLeft[i]--; if (navigator.vibrate) navigator.vibrate(zkLeft[i] === 0 ? 60 : 12);
+  if (zkLeft[i] > 0){ zkLeft[i]--; zkProgress(); if (navigator.vibrate) navigator.vibrate(zkLeft[i] === 0 ? 60 : 12);
     const c = z.querySelector('.zk-c'); c.textContent = zkLeft[i] === 0 ? '✓' : ar(zkLeft[i]);
     if (zkLeft[i] === 0){ z.classList.add('done'); const cat = AZKAR.find(c => c.id === zkCat); const done = cat.items.filter((_,j) => zkLeft[j] === 0).length; $('.zk-progress').textContent = `أنهيت ${ar(done)} من ${ar(cat.items.length)} · اضغط على الذكر للعدّ`; }
   }
@@ -457,6 +478,7 @@ $('#azkarBody').addEventListener('click', e => {
 const TASBIH = ['سُبْحَانَ اللَّهِ','الْحَمْدُ لِلَّهِ','اللَّهُ أَكْبَرُ','لَا إِلَهَ إِلَّا اللَّهُ','أَسْتَغْفِرُ اللَّهَ','سُبْحَانَ اللَّهِ وَبِحَمْدِهِ','لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ','اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ'];
 let tsb = {i:0, n:0};
 function renderTasbih(body){
+  zkProgress();
   body.innerHTML = `<div class="tasbih"><select id="tsbPhrase">${TASBIH.map((t,i) => `<option value="${i}">${t}</option>`).join('')}</select>
     <div class="tasbih-phrase" id="tsbText">${TASBIH[tsb.i]}</div>
     <button class="tasbih-btn" id="tsbBtn" aria-label="سبّح"><b id="tsbN">${ar(tsb.n)}</b></button>
@@ -596,11 +618,15 @@ function boot(){
   if (typeof adhan === 'undefined'){ document.body.innerHTML = '<p style="padding:24px">تعذّر تحميل مكتبة المواقيت.</p>'; return; }
   applyTheme();
   initAlarmTab(); initPrefs(); renderChips(); renderHome(); tick();
-  setInterval(tick, 1000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden){ renderHome(); renderPerms(); } });
+  let timer = setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(timer);
+    if (!document.hidden){ renderHome(); renderPerms(); applyTheme(); tick(); timer = setInterval(tick, 1000); }
+    else if (ringing || RING_MODE) timer = setInterval(tick, 1000);   // شاشة المنبه لازم تبقى شغالة
+  });
   if (RING_MODE){ startRing(false); }
   else {
-    renderAzkar(); sync();
+    sync();
     // أول تشغيل: نحمّل أذان المسجد النبوي وأذان الفجر عشان يطلع صوت الأذان مباشرة
     if (N){ const have = haveSounds(); let done = ''; try { done = localStorage.getItem('fajr.autoDl2') || ''; } catch(e){}
       if (!done){ try{ localStorage.setItem('fajr.autoDl2','1'); }catch(e){}
